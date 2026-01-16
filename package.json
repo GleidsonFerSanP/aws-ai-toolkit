@@ -2,7 +2,7 @@
   "name": "aws-ai-toolkit",
   "displayName": "AWS AI Toolkit",
   "description": "Unified AWS management for AI agents via MCP - Control EC2, RDS, DynamoDB, Lambda, ECS, EKS and more through GitHub Copilot",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "publisher": "GleidsonFerSanP",
   "icon": "icon.png",
   "repository": {

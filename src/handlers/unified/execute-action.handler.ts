@@ -41,7 +41,7 @@ import {
   DeleteTableCommand,
 } from '@aws-sdk/client-dynamodb';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { profileService } from '../../services/profile.service';
+import { getIntelligentCredentials, getRegion } from '../../utils';
 
 interface ExecuteActionArgs {
   action: string;
@@ -53,22 +53,18 @@ interface ExecuteActionArgs {
 }
 
 export async function handleExecuteAction(args: ExecuteActionArgs): Promise<CallToolResult> {
-  // Get profile credentials
-  const profileData = args.profile
-    ? await profileService.getProfile(args.profile)
-    : await profileService.getActiveProfile();
-
-  if (!profileData || !profileData.data) {
-    throw new Error(args.profile ? `Profile '${args.profile}' not found` : 'No active profile configured');
+  // Get credentials intelligently
+  const region = getRegion(args.region);
+  const credResult = await getIntelligentCredentials(args.profile, region);
+  
+  if (credResult.needsConfiguration) {
+    return {
+      content: [{ type: 'text', text: credResult.message || 'AWS credentials not configured.' }],
+      isError: false,
+    };
   }
 
-  const profile = profileData.data;
-  const region = args.region || profile.region;
-  const credentials = {
-    accessKeyId: profile.accessKeyId,
-    secretAccessKey: profile.secretAccessKey,
-    sessionToken: profile.sessionToken,
-  };
+  const credentials = credResult.credentials!;
 
   // Route to appropriate handler based on resource type and action
   const handlerKey = `${args.resourceType}:${args.action}`;

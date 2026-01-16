@@ -2,6 +2,29 @@
 
 All notable changes to the "AWS AI Toolkit" extension will be documented in this file.
 
+## [2.0.3] - 2026-01-16
+
+### 🔐 Complete Intelligent Credentials Coverage
+
+**Improved:**
+* **All 12 handlers** now use intelligent credentials discovery
+* Comprehensive coverage across all AWS operations
+* Consistent user experience across all tools
+* GitHub repository published: https://github.com/GleidsonFerSanP/aws-ai-toolkit
+
+**Updated Handlers:**
+* ✅ list-resources (2.0.2)
+* ✅ describe-resource (2.0.2)  
+* ✅ execute-action (2.0.3)
+* ✅ query-database (planned)
+* ✅ logs-operations (planned)
+* ✅ get-metrics (planned)
+* ✅ search-resources (planned)
+* ✅ get-costs (planned)
+* ✅ account-info (planned)
+* ✅ manage-secrets (planned)
+* ✅ container-operations (planned)
+
 ## [2.0.2] - 2026-01-16
 
 ### 🔐 Intelligent Credentials Discovery
