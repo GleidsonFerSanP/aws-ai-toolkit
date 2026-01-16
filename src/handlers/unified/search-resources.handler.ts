@@ -10,7 +10,7 @@ import {
   GetTagValuesCommand,
 } from '@aws-sdk/client-resource-groups-tagging-api';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { profileService } from '../../services/profile.service';
+import { getIntelligentCredentials, getRegion } from '../../utils';
 
 interface SearchResourcesArgs {
   searchType: string;
@@ -24,22 +24,18 @@ interface SearchResourcesArgs {
 }
 
 export async function handleSearchResources(args: SearchResourcesArgs): Promise<CallToolResult> {
-  // Get profile credentials
-  const profileData = args.profile
-    ? await profileService.getProfile(args.profile)
-    : await profileService.getActiveProfile();
-
-  if (!profileData || !profileData.data) {
-    throw new Error(args.profile ? `Profile '${args.profile}' not found` : 'No active profile configured');
+  // Get credentials intelligently
+  const region = getRegion(args.region);
+  const credResult = await getIntelligentCredentials(args.profile, region);
+  
+  if (credResult.needsConfiguration) {
+    return {
+      content: [{ type: 'text', text: credResult.message || 'AWS credentials not configured.' }],
+      isError: false,
+    };
   }
 
-  const profile = profileData.data;
-  const region = args.region || profile.region;
-  const credentials = {
-    accessKeyId: profile.accessKeyId,
-    secretAccessKey: profile.secretAccessKey,
-    sessionToken: profile.sessionToken,
-  };
+  const credentials = credResult.credentials!;
 
   const client = new ResourceGroupsTaggingAPIClient({ region, credentials });
 

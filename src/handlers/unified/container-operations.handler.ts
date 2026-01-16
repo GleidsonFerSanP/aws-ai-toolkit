@@ -29,7 +29,7 @@ import {
   DeleteNodegroupCommand,
 } from '@aws-sdk/client-eks';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { profileService } from '../../services/profile.service';
+import { getIntelligentCredentials, getRegion } from '../../utils';
 
 interface ContainerOperationsArgs {
   platform: string;
@@ -43,22 +43,18 @@ interface ContainerOperationsArgs {
 }
 
 export async function handleContainerOperations(args: ContainerOperationsArgs): Promise<CallToolResult> {
-  // Get profile credentials
-  const profileData = args.profile
-    ? await profileService.getProfile(args.profile)
-    : await profileService.getActiveProfile();
-
-  if (!profileData || !profileData.data) {
-    throw new Error(args.profile ? `Profile '${args.profile}' not found` : 'No active profile configured');
+  // Get credentials intelligently
+  const region = getRegion(args.region);
+  const credResult = await getIntelligentCredentials(args.profile, region);
+  
+  if (credResult.needsConfiguration) {
+    return {
+      content: [{ type: 'text', text: credResult.message || 'AWS credentials not configured.' }],
+      isError: false,
+    };
   }
 
-  const profile = profileData.data;
-  const region = args.region || profile.region;
-  const credentials = {
-    accessKeyId: profile.accessKeyId,
-    secretAccessKey: profile.secretAccessKey,
-    sessionToken: profile.sessionToken,
-  };
+  const credentials = credResult.credentials!;
 
   // Route to appropriate platform
   if (args.platform === 'ecs') {

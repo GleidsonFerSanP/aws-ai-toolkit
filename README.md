@@ -166,6 +166,7 @@ aws configure
 #### Option 2: Create Profile via GitHub Copilot
 
 Ask Copilot in chat:
+
 ```
 "Create an AWS profile named 'production' with my credentials"
 ```

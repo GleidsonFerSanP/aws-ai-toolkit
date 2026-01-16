@@ -9,7 +9,7 @@ import {
   GetCostForecastCommand,
 } from '@aws-sdk/client-cost-explorer';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { profileService } from '../../services/profile.service';
+import { getIntelligentCredentials } from '../../utils';
 
 interface GetCostsArgs {
   operation: string;
@@ -23,23 +23,20 @@ interface GetCostsArgs {
 }
 
 export async function handleGetCosts(args: GetCostsArgs): Promise<CallToolResult> {
-  // Get profile credentials
-  const profileData = args.profile
-    ? await profileService.getProfile(args.profile)
-    : await profileService.getActiveProfile();
-
-  if (!profileData || !profileData.data) {
-    throw new Error(args.profile ? `Profile '${args.profile}' not found` : 'No active profile configured');
-  }
-
-  const profile = profileData.data;
   // Cost Explorer is a global service, use us-east-1
   const region = 'us-east-1';
-  const credentials = {
-    accessKeyId: profile.accessKeyId,
-    secretAccessKey: profile.secretAccessKey,
-    sessionToken: profile.sessionToken,
-  };
+  
+  // Get credentials intelligently
+  const credResult = await getIntelligentCredentials(args.profile, region);
+  
+  if (credResult.needsConfiguration) {
+    return {
+      content: [{ type: 'text', text: credResult.message || 'AWS credentials not configured.' }],
+      isError: false,
+    };
+  }
+
+  const credentials = credResult.credentials!;
 
   const client = new CostExplorerClient({ region, credentials });
 

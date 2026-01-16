@@ -3,11 +3,11 @@
 ## O que mudou?
 
 A versão 2.0.2 implementa **busca inteligente de credenciais** que:
-- ✅ Detecta credenciais automaticamente de múltiplas fontes
-- ✅ Funciona com AWS CLI já configurado (`~/.aws/credentials`)
-- ✅ Suporta variáveis de ambiente, SSO, perfis MCP, etc.
-- ✅ **Não retorna erro** quando credenciais não são encontradas
-- ✅ Fornece **mensagem amigável** para a AI explicando como configurar
+* ✅ Detecta credenciais automaticamente de múltiplas fontes
+* ✅ Funciona com AWS CLI já configurado (`~/.aws/credentials`)
+* ✅ Suporta variáveis de ambiente, SSO, perfis MCP, etc.
+* ✅ **Não retorna erro** quando credenciais não são encontradas
+* ✅ Fornece **mensagem amigável** para a AI explicando como configurar
 
 ## Cenários de Teste
 
@@ -19,14 +19,16 @@ A versão 2.0.2 implementa **busca inteligente de credenciais** que:
 1. Recarregue o VS Code (Cmd+Shift+P → "Developer: Reload Window")
 2. Abra GitHub Copilot Chat
 3. Teste um comando simples:
-   ```
+   
+
+```
    Liste minhas instâncias EC2
    ```
 
 **Resultado Esperado:**
-- ✅ A extensão deve **detectar automaticamente** suas credenciais do AWS CLI
-- ✅ Log no console mostrará: "✅ Credentials loaded from: AWS Shared Credentials (~/.aws/credentials)"
-- ✅ Comando executa normalmente sem pedir credenciais
+* ✅ A extensão deve **detectar automaticamente** suas credenciais do AWS CLI
+* ✅ Log no console mostrará: "✅ Credentials loaded from: AWS Shared Credentials (~/.aws/credentials)"
+* ✅ Comando executa normalmente sem pedir credenciais
 
 ---
 
@@ -37,20 +39,23 @@ A versão 2.0.2 implementa **busca inteligente de credenciais** que:
 **Passos:**
 1. Renomeie: `mv ~/.aws/credentials ~/.aws/credentials.bak`
 2. No Copilot Chat:
-   ```
+   
+
+```
    Liste minhas instâncias EC2
    ```
 
 **Resultado Esperado:**
-- ❌ **NÃO deve mostrar erro**
-- ✅ Deve retornar mensagem amigável explicando:
-  - Como configurar AWS CLI
-  - Como usar variáveis de ambiente
-  - Como criar profile via MCP
-  - Onde obter credenciais AWS
-- ✅ AI pode responder de forma útil ao usuário
+* ❌ **NÃO deve mostrar erro**
+* ✅ Deve retornar mensagem amigável explicando:
+  + Como configurar AWS CLI
+  + Como usar variáveis de ambiente
+  + Como criar profile via MCP
+  + Onde obter credenciais AWS
+* ✅ AI pode responder de forma útil ao usuário
 
 **Restaurar:**
+
 ```bash
 mv ~/.aws/credentials.bak ~/.aws/credentials
 ```
@@ -61,21 +66,26 @@ mv ~/.aws/credentials.bak ~/.aws/credentials
 
 **Passos:**
 1. Configure variáveis de ambiente:
-   ```bash
+   
+
+```bash
    export AWS_ACCESS_KEY_ID="sua-access-key"
    export AWS_SECRET_ACCESS_KEY="sua-secret-key"
    export AWS_DEFAULT_REGION="us-east-1"
    ```
+
 2. Abra VS Code a partir deste terminal: `code .`
 3. No Copilot Chat:
-   ```
+   
+
+```
    Qual é minha conta AWS?
    ```
 
 **Resultado Esperado:**
-- ✅ Credenciais detectadas de variáveis de ambiente
-- ✅ Log: "✅ Credentials loaded from: Environment Variables"
-- ✅ Mostra informações da conta
+* ✅ Credenciais detectadas de variáveis de ambiente
+* ✅ Log: "✅ Credentials loaded from: Environment Variables"
+* ✅ Mostra informações da conta
 
 ---
 
@@ -83,7 +93,9 @@ mv ~/.aws/credentials.bak ~/.aws/credentials
 
 **Passos:**
 1. Certifique-se de ter múltiplos profiles em `~/.aws/credentials`:
-   ```ini
+   
+
+```ini
    [default]
    aws_access_key_id = ...
    aws_secret_access_key = ...
@@ -94,13 +106,15 @@ mv ~/.aws/credentials.bak ~/.aws/credentials
    ```
 
 2. No Copilot Chat:
-   ```
+   
+
+```
    Use o profile 'production' e liste as instâncias EC2
    ```
 
 **Resultado Esperado:**
-- ✅ Usa o profile especificado
-- ✅ Detecta credenciais do profile correto
+* ✅ Usa o profile especificado
+* ✅ Detecta credenciais do profile correto
 
 ---
 
@@ -113,6 +127,7 @@ Para ver logs detalhados da busca de credenciais:
 3. Ou use Command Palette: "MCP AWS CLI: Show Logs"
 
 **Exemplo de log esperado:**
+
 ```
 [INFO] Trying credentials from: MCP Profile
 [DEBUG] MCP Profile not available: No profiles configured
@@ -128,11 +143,11 @@ Para ver logs detalhados da busca de credenciais:
 
 Após os testes, confirme:
 
-- ✅ Credenciais são detectadas automaticamente do AWS CLI
-- ✅ Não há erros quando credenciais não são encontradas
-- ✅ Mensagens de ajuda são claras e úteis
-- ✅ Multiple fontes de credenciais funcionam
-- ✅ Performance continua rápida (1-2s)
+* ✅ Credenciais são detectadas automaticamente do AWS CLI
+* ✅ Não há erros quando credenciais não são encontradas
+* ✅ Mensagens de ajuda são claras e úteis
+* ✅ Multiple fontes de credenciais funcionam
+* ✅ Performance continua rápida (1-2s)
 
 ---
 
@@ -145,7 +160,9 @@ Se algo não funcionar como esperado:
    - Copie todo o conteúdo
 
 2. **Informações do ambiente:**
-   ```bash
+   
+
+```bash
    # AWS CLI configurado?
    aws sts get-caller-identity
    
@@ -166,21 +183,21 @@ Se algo não funcionar como esperado:
 ## Próximos Passos
 
 **Nota:** A implementação atual cobre 2 dos 12 handlers:
-- ✅ `list-resources.handler.ts`
-- ✅ `describe-resource.handler.ts`
+* ✅ `list-resources.handler.ts`
+* ✅ `describe-resource.handler.ts`
 
 Os demais 10 handlers ainda usam o sistema antigo de profiles MCP.
 
 **Próxima etapa:** Aplicar o padrão inteligente de credenciais nos 10 handlers restantes:
-- execute-action
-- query-database
-- logs-operations
-- get-metrics
-- search-resources
-- get-costs
-- account-info
-- manage-secrets
-- container-operations
-- profile-management (já gerencia profiles, não precisa)
+* execute-action
+* query-database
+* logs-operations
+* get-metrics
+* search-resources
+* get-costs
+* account-info
+* manage-secrets
+* container-operations
+* profile-management (já gerencia profiles, não precisa)
 
 Quer que eu atualize todos agora?
