@@ -1,0 +1,535 @@
+{
+  "features": [
+    {
+      "id": "feat-1768563048705-v1irnwd8c",
+      "name": "Profile Management",
+      "context": "backend",
+      "description": "Gerenciamento completo de profiles AWS incluindo criação, edição, listagem, exclusão, obtenção do profile ativo, configuração de usuários e manutenção de lista de profiles com seus environments",
+      "businessRules": [
+        "Cada profile deve ter um nome único",
+        "Profile ativo deve ser persistido",
+        "Suportar múltiplos environments por profile (dev, staging, prod)",
+        "Validar credenciais AWS ao criar/editar profile",
+        "Permitir configuração de região padrão por profile"
+      ],
+      "useCases": [
+        {
+          "name": "Criar Profile",
+          "description": "Criar novo profile AWS com credenciais e configurações",
+          "steps": [
+            "Receber nome do profile",
+            "Receber access key e secret key",
+            "Receber região padrão",
+            "Validar credenciais",
+            "Salvar profile"
+          ]
+        },
+        {
+          "name": "Listar Profiles",
+          "description": "Listar todos os profiles configurados",
+          "steps": [
+            "Ler arquivo de configuração",
+            "Retornar lista de profiles com metadata"
+          ]
+        },
+        {
+          "name": "Obter Profile Ativo",
+          "description": "Retornar o profile atualmente ativo",
+          "steps": [
+            "Ler configuração de profile ativo",
+            "Retornar dados do profile"
+          ]
+        }
+      ],
+      "relatedContracts": [],
+      "relatedPatterns": [],
+      "dependencies": [],
+      "apiEndpoints": [],
+      "status": "completed",
+      "tags": [
+        "aws",
+        "profiles",
+        "credentials",
+        "configuration"
+      ],
+      "notes": "✅ Implementado com tool unificada 'aws-manage-profiles' suportando todas as 8 operações: create, update, delete, list, get, set-active, get-active, validate. Handler completo em profile-management.handler.ts. Armazenamento persistente em arquivo JSON com error-safe initialization.",
+      "filePaths": [],
+      "createdAt": "2026-01-16T11:30:48.705Z",
+      "updatedAt": "2026-01-16T19:07:00.293Z"
+    },
+    {
+      "id": "feat-1768563048717-gynpofgt8",
+      "name": "AWS Resources Reader",
+      "context": "backend",
+      "description": "Leitura universal de todos os tipos de recursos AWS usando SDK v3, incluindo metadados, tags, status e configurações",
+      "businessRules": [
+        "Suportar paginação para grandes volumes de recursos",
+        "Filtrar por tags e atributos",
+        "Cachear resultados para performance",
+        "Suportar múltiplas regiões simultaneamente",
+        "Retornar dados em formato estruturado JSON"
+      ],
+      "useCases": [
+        {
+          "name": "Listar Recursos por Tipo",
+          "description": "Listar todos os recursos de um tipo específico",
+          "steps": [
+            "Receber tipo de recurso",
+            "Consultar AWS API",
+            "Formatar resposta",
+            "Retornar lista"
+          ]
+        },
+        {
+          "name": "Buscar Recurso por ID",
+          "description": "Buscar detalhes de um recurso específico",
+          "steps": [
+            "Receber ID do recurso",
+            "Identificar tipo automaticamente",
+            "Consultar AWS API",
+            "Retornar detalhes completos"
+          ]
+        }
+      ],
+      "relatedContracts": [],
+      "relatedPatterns": [],
+      "dependencies": [],
+      "apiEndpoints": [],
+      "status": "completed",
+      "tags": [
+        "aws",
+        "resources",
+        "sdk",
+        "universal-reader"
+      ],
+      "notes": "✅ Implementado com tool unificada 'aws-list-resources' suportando EC2, RDS, DynamoDB, ECS, EKS, S3, Lambda, CloudWatch Logs, Secrets Manager e SSM Parameter Store. Handler completo em list-resources.handler.ts com 560 linhas.",
+      "filePaths": [],
+      "createdAt": "2026-01-16T11:30:48.717Z",
+      "updatedAt": "2026-01-16T19:06:18.886Z"
+    },
+    {
+      "id": "feat-1768563048718-cirfaeok9",
+      "name": "CloudWatch Logs Specialist",
+      "context": "backend",
+      "description": "Especialista em leitura, busca e análise de logs do CloudWatch com suporte a filtros avançados, streaming e exportação",
+      "businessRules": [
+        "Suportar busca por palavras-chave e regex",
+        "Permitir filtro por timestamp",
+        "Suportar múltiplos log groups",
+        "Implementar streaming de logs em tempo real",
+        "Limitar resultados para evitar sobrecarga"
+      ],
+      "useCases": [
+        {
+          "name": "Buscar Logs",
+          "description": "Buscar logs com filtros específicos",
+          "steps": [
+            "Receber log group",
+            "Receber filtros (timestamp, keyword)",
+            "Consultar CloudWatch Logs",
+            "Retornar logs formatados"
+          ]
+        },
+        {
+          "name": "Stream Logs em Tempo Real",
+          "description": "Acompanhar logs em tempo real",
+          "steps": [
+            "Conectar ao log stream",
+            "Monitorar novos eventos",
+            "Enviar atualizações"
+          ]
+        }
+      ],
+      "relatedContracts": [],
+      "relatedPatterns": [],
+      "dependencies": [],
+      "apiEndpoints": [],
+      "status": "completed",
+      "tags": [
+        "cloudwatch",
+        "logs",
+        "monitoring",
+        "streaming"
+      ],
+      "notes": "✅ Implementado com tool unificada 'aws-logs-operations' suportando list groups/streams, get events, tail, filter, e CloudWatch Insights queries. Handler completo em logs-operations.handler.ts com 418 linhas.",
+      "filePaths": [],
+      "createdAt": "2026-01-16T11:30:48.718Z",
+      "updatedAt": "2026-01-16T19:06:18.900Z"
+    },
+    {
+      "id": "feat-1768563048719-26zgw2pdb",
+      "name": "Container Clusters Specialist (ECS/EKS)",
+      "context": "backend",
+      "description": "Especialista em gerenciamento e leitura de clusters ECS e EKS, incluindo tasks, services, deployments, pods e nodes",
+      "businessRules": [
+        "Listar clusters com status e métricas",
+        "Obter detalhes de tasks/pods em execução",
+        "Mostrar logs de containers",
+        "Monitorar health checks",
+        "Suportar operações de scaling"
+      ],
+      "useCases": [
+        {
+          "name": "Listar Clusters ECS",
+          "description": "Listar todos os clusters ECS com status",
+          "steps": [
+            "Consultar ECS API",
+            "Obter métricas",
+            "Retornar lista formatada"
+          ]
+        },
+        {
+          "name": "Obter Tasks em Execução",
+          "description": "Listar tasks de um cluster específico",
+          "steps": [
+            "Receber cluster name",
+            "Consultar tasks",
+            "Obter detalhes de cada task",
+            "Retornar informações"
+          ]
+        }
+      ],
+      "relatedContracts": [],
+      "relatedPatterns": [],
+      "dependencies": [],
+      "apiEndpoints": [],
+      "status": "completed",
+      "tags": [
+        "ecs",
+        "eks",
+        "containers",
+        "kubernetes",
+        "docker"
+      ],
+      "notes": "✅ Implementado com tool unificada 'aws-container-operations' suportando ECS (clusters, services, tasks, task definitions) e EKS (clusters, nodegroups, addons) com operações list, describe, create, update, delete, restart, scale. Handler completo em container-operations.handler.ts com 697 linhas.",
+      "filePaths": [],
+      "createdAt": "2026-01-16T11:30:48.719Z",
+      "updatedAt": "2026-01-16T19:06:18.901Z"
+    },
+    {
+      "id": "feat-1768563048719-ye1pm67fu",
+      "name": "AWS Account Data Specialist",
+      "context": "backend",
+      "description": "Especialista em obter informações detalhadas sobre contas AWS, incluindo limites, cotas, billing, IAM e organizações",
+      "businessRules": [
+        "Obter ID da conta",
+        "Listar limites de serviços",
+        "Consultar cotas atuais",
+        "Verificar billing e custos",
+        "Listar usuários IAM e roles"
+      ],
+      "useCases": [
+        {
+          "name": "Obter Informações da Conta",
+          "description": "Obter dados principais da conta AWS",
+          "steps": [
+            "Consultar STS para ID da conta",
+            "Obter alias da conta",
+            "Retornar informações"
+          ]
+        },
+        {
+          "name": "Verificar Limites de Serviços",
+          "description": "Consultar limites e cotas de serviços",
+          "steps": [
+            "Receber nome do serviço",
+            "Consultar Service Quotas API",
+            "Retornar limites e uso atual"
+          ]
+        }
+      ],
+      "relatedContracts": [],
+      "relatedPatterns": [],
+      "dependencies": [],
+      "apiEndpoints": [],
+      "status": "completed",
+      "tags": [
+        "account",
+        "iam",
+        "billing",
+        "quotas",
+        "limits"
+      ],
+      "notes": "✅ Implementado com tool unificada 'aws-account-info' suportando identity (STS), regions, service quotas (list, get, default), e contact information. Handler completo em account-info.handler.ts com 294 linhas. Também inclui 'aws-get-costs' para billing/cost data.",
+      "filePaths": [],
+      "createdAt": "2026-01-16T11:30:48.719Z",
+      "updatedAt": "2026-01-16T19:06:18.902Z"
+    },
+    {
+      "id": "feat-1768563048720-6jitu5gho",
+      "name": "EC2 Instance Management Specialist",
+      "context": "backend",
+      "description": "Especialista em gerenciamento de instâncias EC2, incluindo leitura, criação de bastion hosts, start/stop e monitoramento",
+      "businessRules": [
+        "Listar instâncias com status e métricas",
+        "Criar bastion hosts seguros",
+        "Gerenciar key pairs",
+        "Configurar security groups",
+        "Suportar operações de lifecycle"
+      ],
+      "useCases": [
+        {
+          "name": "Listar Instâncias EC2",
+          "description": "Listar todas as instâncias com detalhes",
+          "steps": [
+            "Consultar EC2 API",
+            "Obter métricas",
+            "Formatar resposta",
+            "Retornar lista"
+          ]
+        },
+        {
+          "name": "Criar Bastion Host",
+          "description": "Criar instância bastion para acesso seguro",
+          "steps": [
+            "Receber configuração",
+            "Criar security group",
+            "Criar key pair",
+            "Lançar instância",
+            "Configurar acesso SSH"
+          ]
+        }
+      ],
+      "relatedContracts": [],
+      "relatedPatterns": [],
+      "dependencies": [],
+      "apiEndpoints": [],
+      "status": "completed",
+      "tags": [
+        "ec2",
+        "instances",
+        "bastion",
+        "compute"
+      ],
+      "notes": "✅ Implementado com tools unificadas: 'aws-list-resources' (ec2-instances, ec2-key-pairs), 'aws-describe-resource' (ec2-instance), 'aws-execute-action' (start, stop, reboot, terminate EC2 instances). Handler execute-action.handler.ts com 880 linhas. Também suporta criação de bastion hosts via serviço dedicado bastion-host.service.ts.",
+      "filePaths": [],
+      "createdAt": "2026-01-16T11:30:48.720Z",
+      "updatedAt": "2026-01-16T19:06:18.903Z"
+    },
+    {
+      "id": "feat-1768563048722-4c2uwdqdp",
+      "name": "RDS Database Specialist",
+      "context": "backend",
+      "description": "Especialista em bancos de dados RDS, incluindo listagem, monitoramento, snapshots, replicação e métricas de performance",
+      "businessRules": [
+        "Listar instâncias RDS com status",
+        "Obter métricas de performance",
+        "Gerenciar snapshots",
+        "Monitorar conexões",
+        "Verificar configurações de backup"
+      ],
+      "useCases": [
+        {
+          "name": "Listar Instâncias RDS",
+          "description": "Listar todos os bancos RDS",
+          "steps": [
+            "Consultar RDS API",
+            "Obter status e métricas",
+            "Retornar lista formatada"
+          ]
+        },
+        {
+          "name": "Obter Métricas de Performance",
+          "description": "Consultar métricas do CloudWatch para RDS",
+          "steps": [
+            "Receber DB identifier",
+            "Consultar métricas",
+            "Formatar dados",
+            "Retornar análise"
+          ]
+        }
+      ],
+      "relatedContracts": [],
+      "relatedPatterns": [],
+      "dependencies": [],
+      "apiEndpoints": [],
+      "status": "completed",
+      "tags": [
+        "rds",
+        "database",
+        "mysql",
+        "postgresql",
+        "aurora"
+      ],
+      "notes": "✅ Implementado com tools unificadas: 'aws-list-resources' (rds-instances, rds-clusters, rds-snapshots, rds-cluster-snapshots), 'aws-describe-resource' (rds-instance, rds-cluster, rds-snapshot), 'aws-execute-action' (start, stop, reboot, delete RDS), e 'aws-query-database' (execute-sql). Serviço dedicado rds.service.ts.",
+      "filePaths": [],
+      "createdAt": "2026-01-16T11:30:48.722Z",
+      "updatedAt": "2026-01-16T19:06:18.904Z"
+    },
+    {
+      "id": "feat-1768563048722-jklla2t9p",
+      "name": "DynamoDB Specialist",
+      "context": "backend",
+      "description": "Especialista em DynamoDB, incluindo leitura de tabelas, índices, métricas, capacidade e operações de backup",
+      "businessRules": [
+        "Listar tabelas com configurações",
+        "Obter métricas de read/write capacity",
+        "Consultar índices globais e locais",
+        "Verificar streams",
+        "Gerenciar backups"
+      ],
+      "useCases": [
+        {
+          "name": "Listar Tabelas DynamoDB",
+          "description": "Listar todas as tabelas com detalhes",
+          "steps": [
+            "Consultar DynamoDB API",
+            "Obter configurações",
+            "Retornar lista"
+          ]
+        },
+        {
+          "name": "Analisar Capacidade",
+          "description": "Analisar uso de capacidade e throttling",
+          "steps": [
+            "Receber table name",
+            "Consultar métricas",
+            "Identificar bottlenecks",
+            "Retornar recomendações"
+          ]
+        }
+      ],
+      "relatedContracts": [],
+      "relatedPatterns": [],
+      "dependencies": [],
+      "apiEndpoints": [],
+      "status": "completed",
+      "tags": [
+        "dynamodb",
+        "nosql",
+        "database",
+        "serverless"
+      ],
+      "notes": "✅ Implementado com tools unificadas: 'aws-list-resources' (dynamodb-tables, dynamodb-backups, dynamodb-global-tables), 'aws-describe-resource' (dynamodb-table, dynamodb-backup, dynamodb-ttl), 'aws-query-database' (query, scan, get-item, batch-get), 'aws-execute-action' (update, delete tables). Handler query-database.handler.ts com 384 linhas. Serviço dedicado dynamodb.service.ts.",
+      "filePaths": [],
+      "createdAt": "2026-01-16T11:30:48.722Z",
+      "updatedAt": "2026-01-16T19:06:18.904Z"
+    },
+    {
+      "id": "feat-1768571506995-b62r9lcfr",
+      "name": "Profile Management (Error-Safe)",
+      "context": "Security",
+      "description": "Sistema completo de gerenciamento de profiles AWS com armazenamento persistente, validação de credenciais, e inicialização error-safe. Implementa 8 MCP tools para criar, listar, atualizar, deletar e gerenciar profiles AWS. Garante que MCP server nunca crashe por falta de profiles através de layered error handling.",
+      "businessRules": [
+        "Profiles armazenados em ~/.mcp-aws-cli/profiles.json",
+        "Credenciais validadas via AWS STS GetCallerIdentity",
+        "Sistema error-safe: MCP server carrega mesmo sem profiles",
+        "Singleton pattern: uma instância ProfileService em toda aplicação",
+        "Storage criado automaticamente se não existir",
+        "Retorna storage vazio se profiles.json ausente (não crasha)",
+        "Mensagens de erro guiam usuário a criar profile com create-profile tool"
+      ],
+      "useCases": [
+        {
+          "name": "Create First Profile",
+          "description": "User creates first AWS profile to start using tools",
+          "steps": [
+            "User calls create-profile with credentials",
+            "System validates credentials via STS",
+            "Profile saved to ~/.mcp-aws-cli/profiles.json",
+            "Set as active profile automatically",
+            "Return success with profile details"
+          ]
+        },
+        {
+          "name": "Use Tool Without Profile",
+          "description": "User tries AWS operation without profile configured",
+          "steps": [
+            "User calls any AWS tool (e.g., list-ec2-instances)",
+            "Service calls profileService.getCredentials()",
+            "ProfileService checks hasProfiles() = false",
+            "Throws ProfileError with create-profile guidance",
+            "Handler catches error and returns BaseResponse",
+            "User receives helpful message with instructions"
+          ]
+        },
+        {
+          "name": "MCP Server Startup",
+          "description": "MCP server initializes without profiles.json",
+          "steps": [
+            "Extension activates and starts MCP server",
+            "ProfileService constructor loads storage",
+            "File ~/.mcp-aws-cli/profiles.json not found",
+            "Returns default empty storage {profiles: {}}",
+            "Server continues loading successfully",
+            "All 73 tools registered and available",
+            "No crashes or errors during initialization"
+          ]
+        }
+      ],
+      "relatedContracts": [
+        "MCP Protocol - BaseResponse structure",
+        "AWS Credentials Interface",
+        "ProfileStorage schema"
+      ],
+      "relatedPatterns": [
+        "Singleton Pattern para ProfileService",
+        "Factory Pattern para AWS Clients",
+        "Repository Pattern para storage",
+        "Error Handler Pattern com ProfileError"
+      ],
+      "dependencies": [],
+      "apiEndpoints": [
+        {
+          "method": "MCP",
+          "path": "create-profile",
+          "description": "Create AWS profile with credentials"
+        },
+        {
+          "method": "MCP",
+          "path": "list-profiles",
+          "description": "List all configured profiles"
+        },
+        {
+          "method": "MCP",
+          "path": "set-active-profile",
+          "description": "Set active profile for operations"
+        },
+        {
+          "method": "MCP",
+          "path": "delete-profile",
+          "description": "Delete profile by name"
+        },
+        {
+          "method": "MCP",
+          "path": "get-active-profile",
+          "description": "Get current active profile"
+        },
+        {
+          "method": "MCP",
+          "path": "update-profile",
+          "description": "Update profile credentials/region"
+        },
+        {
+          "method": "MCP",
+          "path": "get-profile",
+          "description": "Get specific profile details"
+        },
+        {
+          "method": "MCP",
+          "path": "validate-profile",
+          "description": "Validate profile credentials with AWS STS"
+        }
+      ],
+      "status": "completed",
+      "tags": [
+        "aws",
+        "security",
+        "authentication",
+        "error-safe",
+        "mcp-core",
+        "profiles"
+      ],
+      "notes": "CRITICAL: Esta feature é a base de todas as outras. Implementa helper methods hasProfiles(), hasActiveProfile(), getProfileCount() para validação antes de operações AWS. ProfileValidator utility class fornece validação centralizada e mensagens consistentes.",
+      "filePaths": [
+        "src/services/profile.service.ts",
+        "src/handlers/profile.handler.ts",
+        "src/tools/profile.tools.ts",
+        "src/utils/profile-validator.ts",
+        "src/models/profile.model.ts"
+      ],
+      "createdAt": "2026-01-16T13:51:46.995Z",
+      "updatedAt": "2026-01-16T13:51:46.995Z"
+    }
+  ]
+}

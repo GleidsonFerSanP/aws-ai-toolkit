@@ -1,0 +1,23 @@
+.vscode/**
+.vscode-test/**
+src/**
+.gitignore
+.yarnrc
+vsc-extension-quickstart.md
+**/tsconfig.json
+**/.eslintrc.json
+**/*.ts
+.github/**
+*.vsix
+webpack.config.js
+tsconfig.json
+.eslintrc.json
+IMPLEMENTATION_PLAN.md
+SAFETY_VERIFICATION.md
+INSTALL_GUIDE.md
+
+# Include compiled dist and node_modules
+!dist/**
+!node_modules/@aws-sdk/**
+!node_modules/@modelcontextprotocol/**
+!node_modules/node-cache/**

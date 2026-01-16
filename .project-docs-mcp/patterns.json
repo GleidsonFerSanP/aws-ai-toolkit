@@ -1,0 +1,62 @@
+{
+  "patterns": {
+    "aws-client-factory-pattern": {
+      "name": "AWS Client Factory Pattern",
+      "context": "backend",
+      "description": "Pattern for AWS SDK clients with caching, credentials, and region support. All services use this factory to get properly configured AWS clients (EC2, RDS, ECS, CloudWatch, etc). Supports 14 different AWS client types with automatic credential injection and region configuration.",
+      "pattern": "```typescript\n// Factory com cache de clientes\nclass AWSClientFactory {\n  private clientCache: Map<string, any> = new Map();\n\n  public getEC2Client(region: string, credentials: AwsCredentialIdentity): EC2Client {\n    const cacheKey = `ec2-${region}`;\n    if (!this.clientCache.has(cacheKey)) {\n      this.clientCache.set(cacheKey, new EC2Client({\n        region,\n        credentials\n      }));\n    }\n    return this.clientCache.get(cacheKey);\n  }\n}\n\n// Singleton export\nexport const awsClientFactory = AWSClientFactory.getInstance();\n```",
+      "examples": [
+        "const ec2Client = awsClientFactory.getEC2Client(region, credentials);",
+        "const rdsClient = awsClientFactory.getRDSClient('us-east-1', creds);",
+        "const logsClient = awsClientFactory.getCloudWatchLogsClient(region, credentials);"
+      ],
+      "occurrences": 1,
+      "id": "aws-client-factory-pattern",
+      "createdAt": "2026-01-16T13:51:55.729Z"
+    },
+    "mcp-handler-error-pattern": {
+      "name": "MCP Handler Error Pattern",
+      "context": "backend",
+      "description": "Standardized error handling across all MCP handlers. All handlers wrap service calls in try-catch and return MCP-compliant responses with BaseResponse structure. Errors are converted using ErrorHandler.toErrorDetails() for consistency.",
+      "pattern": "```typescript\nexport async function handleToolName(args: Record<string, unknown>) {\n  try {\n    logger.info('Handling tool-name', args);\n    \n    // Validate required parameters\n    if (!args.requiredParam) {\n      throw new Error('requiredParam is required');\n    }\n    \n    // Call service\n    const result = await service.operation(args);\n    \n    return {\n      content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],\n    };\n  } catch (error) {\n    logger.error('Error in handleToolName', error as Error);\n    return {\n      content: [{\n        type: 'text',\n        text: JSON.stringify({\n          success: false,\n          error: ErrorHandler.toErrorDetails(error),\n        }),\n      }],\n      isError: true,\n    };\n  }\n}\n```",
+      "examples": [
+        "Handler catches ProfileError → Returns user-friendly message",
+        "Handler catches AWS SDK error → Returns formatted error details",
+        "Handler validates required parameters → Throws early with clear message"
+      ],
+      "occurrences": 1,
+      "id": "mcp-handler-error-pattern",
+      "createdAt": "2026-01-16T13:52:05.401Z"
+    },
+    "vs-code-extension-mcp-auto-registration-pattern": {
+      "name": "VS Code Extension MCP Auto-Registration Pattern",
+      "context": "backend",
+      "description": "Padrão de registro automático do servidor MCP embutido na extensão VS Code. O servidor MCP DEVE usar código built-in (dist/index.js) e NUNCA paths externos. Registro via registerMcpServerDefinitionProvider com ativação em onStartupFinished.",
+      "pattern": "// extension.ts\\nconst mcpServerPath = path.join(context.extensionPath, 'dist', 'index.js');\\n\\ncontext.subscriptions.push(\\n  vscode.lm.registerMcpServerDefinitionProvider('mcp-aws-cli', {\\n    provideMcpServerDefinitions() {\\n      return [\\n        new vscode.McpStdioServerDefinition(\\n          'mcp-aws-cli',\\n          'node',\\n          [mcpServerPath]  // Built-in path\\n        )\\n      ];\\n    }\\n  })\\n);",
+      "examples": [
+        "const mcpServerPath = path.join(context.extensionPath, 'dist', 'index.js');",
+        "vscode.lm.registerMcpServerDefinitionProvider('mcp-aws-cli', { provideMcpServerDefinitions() { return [new vscode.McpStdioServerDefinition('mcp-aws-cli', 'node', [mcpServerPath])]; } })",
+        "activationEvents: ['onStartupFinished'] no package.json"
+      ],
+      "occurrences": 1,
+      "id": "vs-code-extension-mcp-auto-registration-pattern",
+      "createdAt": "2026-01-16T19:16:14.229Z"
+    },
+    "mcp-tool-count-optimization-pattern-unified-tools": {
+      "name": "MCP Tool Count Optimization Pattern (Unified Tools)",
+      "context": "backend",
+      "description": "Padrão de design para ferramentas MCP: SEMPRE usar ferramentas UNIFICADAS com parâmetros ao invés de ferramentas específicas. GitHub Copilot tem degradação de performance acima de ~128 tools. Mantenha número de tools baixo (<20) agrupando operações relacionadas via parâmetros 'operation', 'resourceType', 'action', etc.",
+      "pattern": "// PADRÃO: Ferramentas MCP Unificadas\\n// REGRA: NUNCA criar tool específica se pode ser unificada\\n\\nexport const unifiedTool: Tool = {\\n  name: 'category-operation',  // Generic name\\n  description: 'Perform operation on multiple resource types',\\n  inputSchema: {\\n    type: 'object',\\n    properties: {\\n      // Parâmetro de roteamento principal\\n      resourceType: {\\n        type: 'string',\\n        enum: ['type-a', 'type-b', 'type-c'],  // ✅ Extensível\\n        description: 'Type of resource'\\n      },\\n      operation: {\\n        type: 'string',\\n        enum: ['op1', 'op2', 'op3'],\\n        description: 'Operation to perform'\\n      },\\n      // Campos comuns\\n      region: { type: 'string' },\\n      profile: { type: 'string' },\\n    },\\n    required: ['resourceType']\\n  }\\n};\\n\\n// Handler com roteamento interno\\nasync function handleUnifiedTool(args) {\\n  switch (args.resourceType) {\\n    case 'type-a': return handleTypeA(args);\\n    case 'type-b': return handleTypeB(args);\\n    // ...\\n  }\\n}",
+      "examples": [
+        "// ✅ CORRETO: Tool unificada\n{name: 'aws-list-resources', inputSchema: {properties: {resourceType: {enum: ['ec2', 'rds', 'dynamodb']}}}}",
+        "// ❌ INCORRETO: Tools específicas\n{name: 'list-ec2-instances'}\n{name: 'list-rds-instances'}\n{name: 'list-dynamodb-tables'}",
+        "// ✅ CORRETO: Agrupar por ação\n{name: 'aws-execute-action', inputSchema: {properties: {action: {enum: ['start', 'stop']}, resourceType: {enum: ['ec2', 'rds']}}}"
+      ],
+      "occurrences": 1,
+      "id": "mcp-tool-count-optimization-pattern-unified-tools",
+      "createdAt": "2026-01-16T19:21:50.768Z"
+    }
+  },
+  "lastUpdated": "2026-01-16T19:21:50.768Z",
+  "version": "1.0.0"
+}

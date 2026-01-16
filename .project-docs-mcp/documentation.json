@@ -1,0 +1,70 @@
+{
+  "documentation": {
+    "vs-code-extension-com-mcp-embutido-arquitetura-e-auto-registro": {
+      "title": "VS Code Extension com MCP Embutido - Arquitetura e Auto-registro",
+      "filePath": "docs/architecture/vscode-extension-mcp-integration.md",
+      "topics": [
+        "VS Code Extension API",
+        "MCP Server Definition Provider",
+        "Auto-registration",
+        "Built-in Server Path",
+        "GitHub Copilot Integration",
+        "Zero-config Installation"
+      ],
+      "keywords": [
+        "vscode",
+        "extension",
+        "mcp",
+        "embedded",
+        "auto-register",
+        "github-copilot",
+        "built-in",
+        "architecture"
+      ],
+      "summary": "Documenta a arquitetura da extensão VS Code que embute um servidor MCP para GitHub Copilot. Explica o registro automático, uso de código built-in (não paths externos), fluxo de ativação, e comparação com arquitetura standalone.",
+      "context": "backend",
+      "type": "architecture",
+      "relatedContracts": [],
+      "relatedFeatures": [],
+      "id": "vs-code-extension-com-mcp-embutido-arquitetura-e-auto-registro",
+      "createdAt": "2026-01-16T19:12:56.252Z",
+      "lastUpdated": "2026-01-16T19:12:56.252Z",
+      "version": 1
+    },
+    "adr-004-refatora-o-de-73-para-12-tools-unificadas-performance": {
+      "title": "ADR-004: Refatoração de 73 para 12 Tools Unificadas (Performance)",
+      "filePath": "docs/architecture/unified-tools-decision.md",
+      "topics": [
+        "GitHub Copilot Performance",
+        "MCP Tool Limits",
+        "Unified Architecture",
+        "Tool Count Optimization",
+        "Performance Metrics",
+        "Refactoring Strategy"
+      ],
+      "keywords": [
+        "performance",
+        "unified-tools",
+        "refactoring",
+        "github-copilot",
+        "73-tools",
+        "12-tools",
+        "tool-limit",
+        "mcp-performance"
+      ],
+      "summary": "ADR-004: Documenta a decisão crítica de refatorar 73 ferramentas MCP específicas para 12 unificadas devido a limitações de performance do GitHub Copilot Chat (degradação acima de 128 tools). Inclui contexto, alternativas consideradas, métricas de melhoria (83% redução, 60% mais rápido, +15% precisão), e comparações quantitativas.",
+      "context": "backend",
+      "type": "architecture",
+      "relatedContracts": [
+        "ADR-004"
+      ],
+      "relatedFeatures": [],
+      "id": "adr-004-refatora-o-de-73-para-12-tools-unificadas-performance",
+      "createdAt": "2026-01-16T19:21:22.904Z",
+      "lastUpdated": "2026-01-16T19:21:22.904Z",
+      "version": 1
+    }
+  },
+  "lastUpdated": "2026-01-16T19:21:22.904Z",
+  "version": "1.0.0"
+}

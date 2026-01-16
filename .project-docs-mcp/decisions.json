@@ -1,0 +1,131 @@
+{
+  "decisions": [
+    {
+      "title": "ADR-001: Usar AWS SDK v3 e VS Code Extension",
+      "context": "Precisamos definir a arquitetura base para integração com AWS. A escolha entre usar AWS CLI via comandos shell, AWS SDK v2 ou v3, e a forma de distribuição (VS Code Extension vs standalone) impacta toda a implementação.",
+      "decision": "Implementar como VS Code Extension usando AWS SDK v3 (JavaScript) com arquitetura modular e MCP Protocol",
+      "consequences": {
+        "positive": [
+          "Type safety completo com TypeScript",
+          "Performance superior (SDK nativo vs shell)",
+          "Modularidade - cada serviço AWS é um pacote separado",
+          "Melhor error handling",
+          "Integração nativa com VS Code",
+          "Distribuição fácil via Marketplace",
+          "Auto-complete e IntelliSense",
+          "SDK v3 é tree-shakeable (bundle menor)"
+        ],
+        "negative": [
+          "Maior complexidade inicial",
+          "Dependência do VS Code",
+          "Bundle size maior devido aos múltiplos clientes AWS"
+        ]
+      },
+      "alternatives": [
+        "Usar AWS CLI via shell commands",
+        "Usar AWS SDK v2",
+        "Implementar como standalone CLI tool"
+      ],
+      "status": "accepted",
+      "id": "ADR-001",
+      "createdAt": "2026-01-16T11:32:12.863Z"
+    },
+    {
+      "title": "Architecture: VS Code Extension + AWS SDK v3 + Error-Safe Profile Management",
+      "context": "O projeto necessita de uma forma segura e eficiente para AI agents gerenciarem recursos AWS através do Model Context Protocol. Após análise de diferentes abordagens, foi decidido implementar como extensão VS Code usando AWS SDK v3 JavaScript com gerenciamento robusto de profiles e error-safe initialization.",
+      "decision": "Implementar como VS Code Extension usando AWS SDK v3 JavaScript com 73 MCP tools organizados em 8 especializações. Arquitetura em camadas (Profile → Service → Handler → MCP Protocol) com singleton services, error-safe initialization, e profile management que não quebra o servidor MCP mesmo sem credenciais configuradas.",
+      "consequences": {
+        "positive": [
+          "Error-safe: MCP server nunca crasha por falta de profiles",
+          "73 tools cobrindo 8 áreas AWS principais",
+          "Cache inteligente (180-300s TTL) reduz chamadas AWS",
+          "Mensagens de erro user-friendly com guidance",
+          "Type safety completa com TypeScript strict mode",
+          "Fácil extensão para novos serviços AWS",
+          "Integração nativa com GitHub Copilot e Claude",
+          "Singleton pattern garante consistência de estado"
+        ],
+        "negative": [
+          "Dependência do VS Code como runtime",
+          "Requer Node.js 18+ instalado",
+          "Credenciais armazenadas em texto plano (~/.mcp-aws-cli/profiles.json)",
+          "Package size de 90.7 KB pode ser grande para alguns casos"
+        ]
+      },
+      "alternatives": [
+        "Usar AWS CLI diretamente via shell commands",
+        "Implementar como CLI standalone sem VS Code",
+        "Usar AWS SDK v2 (mais antigo)",
+        "Não implementar cache de credenciais"
+      ],
+      "status": "accepted",
+      "id": "ADR-002",
+      "createdAt": "2026-01-16T13:51:26.344Z"
+    },
+    {
+      "title": "Extensão VS Code com MCP Embutido para Auto-registro com GitHub Copilot",
+      "context": "O projeto precisa prover ferramentas AWS para o GitHub Copilot via MCP Protocol. A questão era: como distribuir e registrar o servidor MCP de forma que funcione automaticamente quando instalado, sem configuração manual do usuário?",
+      "decision": "Implementar como EXTENSÃO VS CODE que EMBUTE o servidor MCP. A extensão usa registerMcpServerDefinitionProvider() para auto-registrar o servidor apontando para código built-in (./dist/index.js). Ativa automaticamente via 'onStartupFinished'. O usuário apenas instala a extensão - zero configuração adicional.",
+      "consequences": {
+        "positive": [
+          "Zero-config: instalar extensão = servidor disponível",
+          "Path built-in: sem hardcoded paths externos",
+          "Auto-registration: não requer editar arquivos de config",
+          "Distribuição via VS Code Marketplace",
+          "Versionamento unificado: extensão e servidor sempre em sync",
+          "Melhor UX: comandos visuais, settings, output channel",
+          "Segurança: sem exposição de rede, processo isolado"
+        ],
+        "negative": [
+          "Requer VS Code como plataforma (não funciona standalone)",
+          "Bundle maior (extensão + servidor juntos)",
+          "Dependência da API do VS Code para MCP registration",
+          "Apenas um servidor MCP por instalação da extensão"
+        ]
+      },
+      "alternatives": [
+        "Servidor MCP standalone com configuração manual no claude_desktop_config.json",
+        "Servidor MCP como pacote npm global instalado via npx",
+        "Híbrido: extensão + servidor separado"
+      ],
+      "status": "accepted",
+      "id": "ADR-003",
+      "createdAt": "2026-01-16T19:13:29.116Z"
+    },
+    {
+      "title": "Refatoração: 73 Tools Específicas → 12 Tools Unificadas (Performance do GitHub Copilot)",
+      "context": "A implementação inicial do MCP AWS CLI tinha 73 ferramentas específicas (uma para cada operação AWS: list-ec2-instances, describe-ec2-instance, start-ec2-instances, etc.). Durante testes, identificamos que o GitHub Copilot Chat tem degradação de performance significativa quando o número de tools MCP ultrapassa ~128. Com 73 tools, o Copilot já apresentava lentidão na seleção de ferramentas e às vezes falhava em escolher a tool correta.",
+      "decision": "Refatorar a arquitetura de 73 ferramentas específicas para 12 ferramentas UNIFICADAS genéricas. Cada tool unificada agrupa operações relacionadas usando um parâmetro 'operation' ou 'resourceType'. Exemplo: ao invés de 'list-ec2-instances', 'list-rds-instances', 'list-dynamodb-tables', temos apenas 'aws-list-resources' com parâmetro resourceType. Isso reduz drasticamente o número de tools expostas ao Copilot, melhorando performance e precisão na seleção.",
+      "consequences": {
+        "positive": [
+          "Performance do GitHub Copilot dramaticamente melhorada",
+          "Seleção de tools mais precisa pelo Copilot",
+          "Redução de 73 para 12 tools (83% menos)",
+          "Manutenibilidade: menos arquivos, menos duplicação",
+          "Escalabilidade: adicionar nova operação não aumenta contagem de tools",
+          "Consistência: padrão uniforme em todas as operações",
+          "Menor overhead de processamento no MCP server",
+          "Melhor UX: Copilot responde mais rápido"
+        ],
+        "negative": [
+          "Schemas mais complexos com múltiplos enums e campos condicionais",
+          "Handlers precisam de lógica de roteamento interna (switch/case)",
+          "Documentação de cada tool fica mais longa",
+          "Usuários precisam entender o conceito de 'operation' e 'resourceType'",
+          "Migração de código existente (se houver integrações)"
+        ]
+      },
+      "alternatives": [
+        "Manter 73 tools específicas e aceitar a degradação de performance",
+        "Dividir em múltiplos servidores MCP especializados (EC2, RDS, etc.)",
+        "Criar sistema de discovery dinâmico onde tools são carregadas sob demanda",
+        "Usar apenas as tools mais importantes (subset de ~30 tools)"
+      ],
+      "status": "accepted",
+      "id": "ADR-004",
+      "createdAt": "2026-01-16T19:19:13.399Z"
+    }
+  ],
+  "lastUpdated": "2026-01-16T19:19:13.399Z",
+  "version": "1.0.0"
+}
